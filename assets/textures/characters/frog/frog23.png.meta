@@ -1,0 +1,30 @@
+{
+  "ver": "1.0.0",
+  "uuid": "57891666-0259-4d17-b74f-60e4d48d15f2",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "point",
+  "subMetas": {
+    "frog23": {
+      "ver": "1.0.3",
+      "uuid": "abd9c9ef-3076-4c39-8cc3-404af8309af2",
+      "rawTextureUuid": "57891666-0259-4d17-b74f-60e4d48d15f2",
+      "trimType": "custom",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 20,
+      "height": 28,
+      "rawWidth": 20,
+      "rawHeight": 28,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
