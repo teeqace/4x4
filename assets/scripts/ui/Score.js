@@ -34,6 +34,8 @@ const Score = cc.Class({
 
     this._score += data.score;
     this.scoreLabel.string = this._score;
+
+    cc.log(`addScore:${data.score} event:${data.event} calc:${data.calc}`);
   }
   // called every frame, uncomment this function to activate update callback
   // update: function (dt) {

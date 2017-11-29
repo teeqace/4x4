@@ -22,7 +22,7 @@ cc.Class({
 
   // use this for initialization
   onLoad: function () {
-    messagePipeline.on('onGameOver', this._onTouchCancel, this);
+    messagePipeline.on('onTimeOver', this._onTouchCancel, this);
   },
   
   init(data) {
@@ -75,6 +75,9 @@ cc.Class({
   },
   
   _onTouchBegan(event) {
+    if (Tiles.instance.isTimeOver) {
+      return;
+    }
     this.node.emit('onPieceTouch', {
       piece: this,
       cueNum: this._cueNum

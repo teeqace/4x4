@@ -23,12 +23,12 @@ cc.Class({
     this.node.setScale(1);
   },
 
-  $pressStart() {
+  $pressStart(event, customEventData) {
     if (this._pressed) {
       return;
     }
     this.node.runAction(this._anim);
     this._pressed = true;
-    messagePipeline.sendMessage('onGameStartPressed');
+    messagePipeline.sendMessage('onGameStartPressed', customEventData);
   }
 });

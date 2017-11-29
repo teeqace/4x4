@@ -1,13 +1,14 @@
 import { messagePipeline } from '../core/MessagePipeline';
 
-const TIME = 60;
+const TIME = 45;
 
 cc.Class({
   extends: cc.Component,
 
   properties: {
     timerLabel: cc.Label,
-    anim: cc.Animation
+    anim: cc.Animation,
+    timerFill: cc.Sprite
   },
 
   // use this for initialization
@@ -26,6 +27,7 @@ cc.Class({
     this.node.color = cc.hexToColor('#FFFFFF');
     this.isRed = false;
     this.redAnimation = 5;
+    this.timerFill.fillRange = 1;
   },
 
   _onGameStart() {
@@ -38,6 +40,7 @@ cc.Class({
     }
     this.timer = Math.max(0, this.timer - dt);
     this.timerLabel.string = Math.ceil(this.timer);
+    this.timerFill.fillRange = this.timer / TIME;
     if (!this.isRed && this.timer <= 5) {
       this.node.color = cc.hexToColor('#FF6600');
       this.isRed = true;
@@ -48,7 +51,8 @@ cc.Class({
     }
     if (this.timer <= 0) {
       this.timerStart = false;
-      messagePipeline.sendMessage('onGameOver');
+      messagePipeline.sendMessage('onTimeOver');
+      // messagePipeline.sendMessage('onGameOver');
     }
   }
 });

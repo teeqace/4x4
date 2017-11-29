@@ -14,13 +14,13 @@ cc.Class({
     this.node.x = 0;
   },
 
-  $pressStart() {
+  $pressStart(event, customEventData) {
     if (this._pressed) {
       return;
     }
     this.node.runAction(this._anim);
     this._pressed = true;
     SEPlay.instance.play('bgm');
-    messagePipeline.sendMessage('onGameStartPressed');
+    messagePipeline.sendMessage('onGameStartPressed', customEventData);
   }
 });

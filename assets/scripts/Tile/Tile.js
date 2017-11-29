@@ -1,6 +1,9 @@
 import Tiles from './Tiles';
 import { messagePipeline } from '../core/MessagePipeline';
 
+const BOMB_TIME = 2;
+const BOMB_TIME_EXTEND = 1;
+
 cc.Class({
   extends: cc.Component,
 
@@ -18,33 +21,37 @@ cc.Class({
       },
       visible: false
     },
-    id: {
-      get: function () {
-        return this._id;
-      },
-      visible: false
-    },
     layerCount: {
       get: function () {
         return this._layerCount;
       },
       visible: false
-    }
+    },
+    isBomb: {
+      get: function () {
+        return this._isBomb;
+      },
+      visible: false
+    },
+    bombTimerNode: cc.Node,
+    bombTimerFill: cc.Sprite
   },
 
   // use this for initialization
   onLoad: function () {
     this._type = 0;
     this._layerCount = 0;
-    this._id = '';
     this._flashTimer = Math.random() * 6;
     this._flashInterval = 0;
-    this._bombEffectTemp = 0;
+    // this._bombEffectTemp = 0;
+    this._bombTimer = 0;
   },
 
-  init(id) {
-    this._id = id;
+  init(x, y) {
+    this._x = x;
+    this._y = y;
     this.bombReadyNode.opacity = 0;
+    this.bombTimerNode.active = false;
   },
 
   restart(type) {
@@ -54,6 +61,8 @@ cc.Class({
     this.tileSpriteNode.color = Tiles.instance.getColor(this._type);
     this._setRandomFlashTime();
     this.bombReadyNode.opacity = 0;
+    this.bombTimerNode.active = false;
+    this._bombTimer = 0;
   },
 
   update(dt) {
@@ -63,6 +72,9 @@ cc.Class({
         this.flashAnimation.play();
         this._setRandomFlashTime();
       }
+    }
+    if (this._layerCount >= 4 && this.bombTimerNode.active) {
+      this.bombTimerFill.fillRange = Tiles.instance.bombTimerRate;
     }
   },
 
@@ -74,10 +86,13 @@ cc.Class({
 
   tileSet(type) {
     if (this._type === type) {
-      this._layerCount = Math.min(4, this._layerCount + 1);
+      // this._layerCount = Math.min(4, this._layerCount + 1);
+      this._layerCount += 1;
       this.tilesetAnimation.play();
       this.layerCountLabel.string = this._layerCount;
       messagePipeline.sendMessage('onAddScore', {
+        event: 'tileSet',
+        calc: `10`,
         score: 10
       });
     } else if (this._type === 0) {
@@ -91,48 +106,98 @@ cc.Class({
       // this.tileSpriteNode.color = Tiles.instance.getColor(this._type);
       // this.layerCountLabel.string = this._layerCount;
     }
-    let isBombing = false;
+    // let isBombing = false;
     if (this._layerCount >= 4) {
-      this.bombReadyAnimation.play();
-      isBombing = true;
+      this.bomblize();
+      // this.bombReadyAnimation.play();
+      // this.bombTimerNode.active = true;
+      // this._bombTimer = BOMB_TIME;
+      // this.bombTimerFill.fillRange = this._bombTimer / BOMB_TIME;
+      // isBombing = true;
     }
-    return isBombing;
+    // return isBombing;
     // this.layerCountLabel.string = this._layerCount;
   },
 
   bombClear(chains) {
     this._type = 0;
     this.tileSpriteNode.color = Tiles.instance.getColor(this._type);
-    this._layerCount = 0;
     this.layerCountLabel.string = '';
     this.bombReadyAnimation.stop();
     this.bombReadyNode.opacity = 0;
+    this.bombTimerNode.active = false;
     messagePipeline.sendMessage('onAddScore', {
-      score: 50 * chains
+      event: 'bombExplode',
+      calc: `10 * ${this._layerCount} * ${chains}`,
+      score: 10 * this._layerCount * chains
     });
+    this._layerCount = 0;
+    this._isBomb = false;
   },
 
-  bombEffectTemp() {
-    this._bombEffectTemp += 1;
-  },
+  // bombEffectTemp() {
+  //   this._bombEffectTemp += 1;
+  // },
 
-  bombEffect() {
-    if (this._bombEffectTemp > 0 && this._type !== 0) {
+  // bombEffect() {
+  //   if (this._bombEffectTemp > 0 && this._type !== 0) {
+  //     this.bombAnimation.play();
+  //     this._layerCount = Math.min(4, this._layerCount + this._bombEffectTemp);
+  //     this.layerCountLabel.string = this._layerCount;
+  //     messagePipeline.sendMessage('onAddScore', {
+  //       score: 10 * this._bombEffectTemp
+  //     });
+  //   }
+  //   if (this._layerCount >= 4) {
+  //     this.bombReadyAnimation.play();
+  //     this.bombTimerNode.active = true;
+  //     this.bombTimerFill.fillRange = 1;
+  //   }
+  //   this._bombEffectTemp = 0;
+  // },
+  
+  bombExplosionEffect() {
+    if (this._type !== 0) {
       this.bombAnimation.play();
-      this._layerCount = Math.min(4, this._layerCount + this._bombEffectTemp);
+      // this._layerCount = Math.min(4, this._layerCount + 1);
+      this._layerCount += 1;
       this.layerCountLabel.string = this._layerCount;
       messagePipeline.sendMessage('onAddScore', {
-        score: 10 * this._bombEffectTemp
+        event: 'bombExplodeEffect',
+        calc: `10`,
+        score: 10
       });
     }
     if (this._layerCount >= 4) {
-      this.bombReadyAnimation.play();
+      // this.bombReadyAnimation.play();
+      // this.bombTimerNode.active = true;
+      // this.bombTimerFill.fillRange = 1;
+      this.bomblize();
     }
-    this._bombEffectTemp = 0;
+    // this._bombEffectTemp = 0;
+  },
+
+  bomblize() {
+    if (!this._isBomb) {
+      this._isBomb = true;
+      this.bombReadyAnimation.play();
+      this.bombTimerNode.active = true;
+      this._bombTimer = BOMB_TIME;
+      this.bombTimerFill.fillRange = this._bombTimer / BOMB_TIME;
+    } else if (Tiles.instance.isNoBomb) {
+      this._bombTimer += BOMB_TIME_EXTEND;
+      this.bombTimerFill.fillRange = this._bombTimer / BOMB_TIME;
+    }
+  },
+
+  update(dt) {
+    if (!this._isBomb) {
+      return;
+    }
+    this._bombTimer -= dt;
+    this.bombTimerFill.fillRange = Math.max(0, this._bombTimer / BOMB_TIME);
+    if (this._bombTimer <= 0) {
+      this.node.emit('onBombExplode', {x: this._x, y: this._y});
+    }
   }
-
-  // called every frame, uncomment this function to activate update callback
-  // update: function (dt) {
-
-  // },
 });

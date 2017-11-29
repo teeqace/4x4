@@ -13,12 +13,14 @@ cc.Class({
       default: [],
       type: [cc.Node]
     },
-    pieceTempNode: cc.Node
+    pieceTempNode: cc.Node,
+    timerOverCover: cc.Node
   },
 
   // use this for initialization
   onLoad: function () {
     messagePipeline.on('onGameStartPressed', this._onGameStartPressed, this);
+    messagePipeline.on('onTimeOver', this._onTimeOver, this);
     this._pieces = [];
     for (let i = 0; i < this.cues.length; i++) {
       let piece = cc.instantiate(this.piecePrefab);
@@ -34,9 +36,14 @@ cc.Class({
   },
   
   _onGameStartPressed() {
+    this.timerOverCover.active = false;
     for (let i = 0; i < this._pieces.length; i++) {
       this._pieces[i].shuffle();
     }
+  },
+
+  _onTimeOver() {
+    this.timerOverCover.active = true;
   },
 
   _onPieceTouch(event) {
