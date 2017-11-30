@@ -23,6 +23,13 @@ const SEPlay = cc.Class({
     if (index >= 0) {
       this.audioSources[index].play();
     }
+  },
+
+  stop(soundName) {
+    let index = this.clipNames.indexOf(soundName);
+    if (index >= 0) {
+      this.audioSources[index].stop();
+    }
   }
 });
 

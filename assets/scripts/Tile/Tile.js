@@ -2,6 +2,7 @@ import Tiles from './Tiles';
 import { messagePipeline } from '../core/MessagePipeline';
 
 const BOMB_TIME = 2;
+const BOMB_TIME_TIMEROVER = 0.5;
 const BOMB_TIME_EXTEND = 1;
 
 cc.Class({
@@ -39,6 +40,7 @@ cc.Class({
 
   // use this for initialization
   onLoad: function () {
+    messagePipeline.on('onTimeOver', this._onTimeOver, this);
     this._type = 0;
     this._layerCount = 0;
     this._flashTimer = Math.random() * 6;
@@ -63,6 +65,14 @@ cc.Class({
     this.bombReadyNode.opacity = 0;
     this.bombTimerNode.active = false;
     this._bombTimer = 0;
+    this._bombTimerMax = BOMB_TIME;
+  },
+
+  _onTimeOver() {
+    this._bombTimerMax = BOMB_TIME_TIMEROVER;
+    if (this._isBomb && this._bombTimer > this._bombTimerMax) {
+      this._bombTimer = this._bombTimerMax;
+    }
   },
 
   update(dt) {
@@ -182,11 +192,11 @@ cc.Class({
       this._isBomb = true;
       this.bombReadyAnimation.play();
       this.bombTimerNode.active = true;
-      this._bombTimer = BOMB_TIME;
-      this.bombTimerFill.fillRange = this._bombTimer / BOMB_TIME;
+      this._bombTimer = this._bombTimerMax;
+      this.bombTimerFill.fillRange = this._bombTimer / this._bombTimerMax;
     } else if (Tiles.instance.isNoBomb) {
       this._bombTimer += BOMB_TIME_EXTEND;
-      this.bombTimerFill.fillRange = this._bombTimer / BOMB_TIME;
+      this.bombTimerFill.fillRange = this._bombTimer / this._bombTimerMax;
     }
   },
 
@@ -195,7 +205,7 @@ cc.Class({
       return;
     }
     this._bombTimer -= dt;
-    this.bombTimerFill.fillRange = Math.max(0, this._bombTimer / BOMB_TIME);
+    this.bombTimerFill.fillRange = Math.max(0, this._bombTimer / this._bombTimerMax);
     if (this._bombTimer <= 0) {
       this.node.emit('onBombExplode', {x: this._x, y: this._y});
     }

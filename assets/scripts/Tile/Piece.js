@@ -100,6 +100,8 @@ cc.Class({
     if (!this._touchStart) {
       return;
     }
+    let delta = event.getDelta();
+    this.node.position = this.node.position.add(delta);
     messagePipeline.sendMessage('onPieceMove', this.node.position);
     this.node.emit('onPieceTouchEnd', {
       piece: this,

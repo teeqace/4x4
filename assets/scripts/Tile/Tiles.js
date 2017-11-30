@@ -113,6 +113,7 @@ const Tiles = cc.Class({
         initColors[`${x}-${y}`] = type;
       }
     }
+    SEPlay.instance.play('bgm');
   },
 
   _onTimeOver() {
@@ -120,6 +121,8 @@ const Tiles = cc.Class({
     if (!this._bombExists()) {
       messagePipeline.sendMessage('onGameOver');
     }
+    SEPlay.instance.play('whistle');
+    SEPlay.instance.stop('bgm');
   },
 
   _bombExists() {

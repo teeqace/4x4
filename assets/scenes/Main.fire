@@ -6225,6 +6225,9 @@
       },
       {
         "__id__": 168
+      },
+      {
+        "__id__": 169
       }
     ],
     "_prefab": null,
@@ -6321,6 +6324,23 @@
     "_volume": 0.3,
     "_mute": false,
     "_loop": true,
+    "playOnLoad": false,
+    "preload": false
+  },
+  {
+    "__type__": "cc.AudioSource",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 164
+    },
+    "_enabled": true,
+    "_clip": {
+      "__uuid__": "a0949895-a4a8-4931-a1e8-c72617dfb4b3"
+    },
+    "_volume": 0.4,
+    "_mute": false,
+    "_loop": false,
     "playOnLoad": false,
     "preload": false
   }

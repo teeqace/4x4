@@ -1,4 +1,3 @@
-import SEPlay from '../core/SEPlay';
 import { messagePipeline } from '../core/MessagePipeline';
 
 cc.Class({
@@ -20,7 +19,6 @@ cc.Class({
     }
     this.node.runAction(this._anim);
     this._pressed = true;
-    SEPlay.instance.play('bgm');
     messagePipeline.sendMessage('onGameStartPressed', customEventData);
   }
 });
